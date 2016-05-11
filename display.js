@@ -1,23 +1,23 @@
 var gpio = require('rpi-gpio');
 var async = require('async');
 
-var LDC_RS = 7;
-var LDC_E = 8;
-var LDC_D4 = 25;
-var LDC_D5 = 24;
-var LDC_D6 = 23;
-var LDC_D7 = 18;
-var LDC_WIDTH = 16;
-var LDC_CHR = 1;
-var LDC_CMD = 0;
-
-var LDC_LINE_1 = 0x80;
-var LDC_LINE_2 = 0xC0;
+var LCD_RS = 7;
+var LCD_E = 8;
+var LCD_D4 = 25;
+var LCD_D5 = 24;
+var LCD_D6 = 23;
+var LCD_D7 = 18;
+var LCD_WIDTH = 16;
+var LCD_CHR = 1;
+var LCD_CMD = 0;
+       
+var LCD_LINE_1 = 0x80;
+var LCD_LINE_2 = 0xC0;
 
 lcdInit();
 
-lcdString("Hello", LDC_LINE_1);
-lcdString("Raspberry", LDC_LINE_2);
+lcdString("Hello", LCD_LINE_1);
+lcdString("Raspberry", LCD_LINE_2);
 
 lcdDestroy();
 
@@ -28,12 +28,12 @@ function lcdInit() {
   gpio.setMode(gpio.MODE_BCM);
 
   async.parallel([
-    setupPort(LDC_RS, gpio.DIR_OUT),
-    setupPort(LDC_E,  gpio.DIR_OUT),
-    setupPort(LDC_D4, gpio.DIR_OUT),
-    setupPort(LDC_D5, gpio.DIR_OUT),
-    setupPort(LDC_D6, gpio.DIR_OUT),
-    setupPort(LDC_D7, gpio.DIR_OUT)
+    setupPort(LCD_RS, gpio.DIR_OUT),
+    setupPort(LCD_E,  gpio.DIR_OUT),
+    setupPort(LCD_D4, gpio.DIR_OUT),
+    setupPort(LCD_D5, gpio.DIR_OUT),
+    setupPort(LCD_D6, gpio.DIR_OUT),
+    setupPort(LCD_D7, gpio.DIR_OUT)
   ]);
 
   lcdByte(0x33, LCD_CMD);
@@ -54,18 +54,18 @@ function lcdClear() {
 
 function lcdByte(byte, mode) {
   async.series([
-    writeValue(LDC_RS, mode),
-    writeValue(LDC_D4, (byte & 0x10) == 0x10 ? 1 : 0),
-    writeValue(LDC_D5, (byte & 0x20) == 0x20 ? 1 : 0),
-    writeValue(LDC_D6, (byte & 0x40) == 0x40 ? 1 : 0),
-    writeValue(LDC_D7, (byte & 0x80) == 0x80 ? 1 : 0),
+    writeValue(LCD_RS, mode),
+    writeValue(LCD_D4, (byte & 0x10) == 0x10 ? 1 : 0),
+    writeValue(LCD_D5, (byte & 0x20) == 0x20 ? 1 : 0),
+    writeValue(LCD_D6, (byte & 0x40) == 0x40 ? 1 : 0),
+    writeValue(LCD_D7, (byte & 0x80) == 0x80 ? 1 : 0),
     //toggle enable pin
     writeDelayValue(LCD_E, 1),
     writeDelayValue(LCD_E, 0),
-    writeValue(LDC_D4, (byte & 0x01) == 0x01 ? 1 : 0),
-    writeValue(LDC_D5, (byte & 0x02) == 0x02 ? 1 : 0),
-    writeValue(LDC_D6, (byte & 0x04) == 0x04 ? 1 : 0),
-    writeValue(LDC_D7, (byte & 0x08) == 0x08 ? 1 : 0),
+    writeValue(LCD_D4, (byte & 0x01) == 0x01 ? 1 : 0),
+    writeValue(LCD_D5, (byte & 0x02) == 0x02 ? 1 : 0),
+    writeValue(LCD_D6, (byte & 0x04) == 0x04 ? 1 : 0),
+    writeValue(LCD_D7, (byte & 0x08) == 0x08 ? 1 : 0),
     //toggle enable pin
     writeDelayValue(LCD_E, 1),
     writeDelayValue(LCD_E, 0)
@@ -73,10 +73,10 @@ function lcdByte(byte, mode) {
 }
 
 function lcdString(str, line) {
-  ldcByte(line, LDC_CMD);
+  lcdByte(line, LCD_CMD);
 
   for (var i = 0, len = str.length; i < len; i++) {
-    ldcByte(str[i], LDC_CHR);
+    lcdByte(str[i], LCD_CHR);
   }
 }
 
