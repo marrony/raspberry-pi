@@ -1,13 +1,12 @@
 var gpio = require('rpi-gpio');
 var async = require('async');
 
-var LCD_RS = 7;
-var LCD_E = 8;
-var LCD_D4 = 25;
-var LCD_D5 = 24;
-var LCD_D6 = 23;
-var LCD_D7 = 18;
-var LCD_WIDTH = 16;
+var LCD_RS = 26;
+var LCD_E = 24;
+var LCD_D4 = 22;
+var LCD_D5 = 18;
+var LCD_D6 = 16;
+var LCD_D7 = 12;
 var LCD_CHR = 1;
 var LCD_CMD = 0;
        
@@ -60,15 +59,15 @@ function lcdByte(byte, mode) {
     writeValue(LCD_D6, (byte & 0x40) == 0x40 ? 1 : 0),
     writeValue(LCD_D7, (byte & 0x80) == 0x80 ? 1 : 0),
     //toggle enable pin
-    writeDelayValue(LCD_E, 1),
-    writeDelayValue(LCD_E, 0),
+    writeDelayValue(LCD_E, 1, 10),
+    writeDelayValue(LCD_E, 0, 10),
     writeValue(LCD_D4, (byte & 0x01) == 0x01 ? 1 : 0),
     writeValue(LCD_D5, (byte & 0x02) == 0x02 ? 1 : 0),
     writeValue(LCD_D6, (byte & 0x04) == 0x04 ? 1 : 0),
     writeValue(LCD_D7, (byte & 0x08) == 0x08 ? 1 : 0),
     //toggle enable pin
-    writeDelayValue(LCD_E, 1),
-    writeDelayValue(LCD_E, 0)
+    writeDelayValue(LCD_E, 1, 10),
+    writeDelayValue(LCD_E, 0, 10)
   ]);
 }
 
