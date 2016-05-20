@@ -1,14 +1,12 @@
-var gpio = require('rpi-gpio');
-var async = require('async');
-var sleep = require('sleep');
 var Gpio = require('onoff').Gpio;
+var sleep = require('sleep');
 
-var LCD_RS = '7';
-var LCD_E = '8';
-var LCD_D4 = '25';
-var LCD_D5 = '24';
-var LCD_D6 = '23';
-var LCD_D7 = '18';
+var LCD_RS = new Gpio(7, 'out');
+var LCD_E = new Gpio(8, 'out');
+var LCD_D4 = new Gpio(25, 'out');
+var LCD_D5 = new Gpio(24, 'out');
+var LCD_D6 = new Gpio(23, 'out');
+var LCD_D7 = new Gpio(18, 'out');
 
 var LCD_CHR = true;
 var LCD_CMD = false;
@@ -18,21 +16,19 @@ var LCD_LINE_2 = 0xC0;
 
 lcdInit();
 
-var pin = 2;
+var pin = new Gpio(2, 'out');
 
-gpio.setup(pin, gpio.DIR_OUT, function() {
   console.log('blah');
-sleep.sleep(1);
-gpio.write(pin, 1);
-sleep.sleep(1);
-gpio.write(pin, 0);
-sleep.sleep(1);
-gpio.write(pin, 1);
-sleep.usleep(1);
-gpio.write(pin, 0);
-sleep.sleep(1);
+	sleep.sleep(1);
+	pin.writeSync(1);
+	sleep.sleep(1);
+	pin.writeSync(0);
+	sleep.sleep(1);
+	pin.writeSync(1);
+	sleep.usleep(1);
+	pin.writeSync(0);
+	sleep.sleep(1);
   console.log('blah2');
-});
 
 //lcdString("A", LCD_LINE_1);
 //lcdString("Raspberry", LCD_LINE_2);
@@ -43,18 +39,6 @@ sleep.sleep(1);
 ////////////////////////////////////////
 
 function lcdInit() {
-  //gpio.setMode(gpio.MODE_BCM);
-
-  async.parallel([
-    setupPort(LCD_RS, gpio.DIR_OUT),
-    setupPort(LCD_E,  gpio.DIR_OUT),
-    setupPort(LCD_D4, gpio.DIR_OUT),
-    setupPort(LCD_D5, gpio.DIR_OUT),
-    setupPort(LCD_D6, gpio.DIR_OUT),
-    setupPort(LCD_D7, gpio.DIR_OUT),
-    setupPort(2, gpio.DIR_OUT)
-  ]);
-
   console.log('lcdInit');
   lcdByte(0x33, LCD_CMD);
   lcdByte(0x32, LCD_CMD);
@@ -71,7 +55,6 @@ function lcdClear() {
 }
 
 function lcdDestroy() {
-  gpio.destroy();
 }
 
 function lcdByte(byte, mode) {
@@ -112,30 +95,7 @@ function lcdString(str, line) {
 
 /////////////////////////////////
 
-function setupPort(port, direction) {
-  return function(cb) {
-    gpio.setup(port, direction, cb);
-  }
-}
-
-function writeValue(port, value) {
-  return function(cb) {
-    console.log('write', port, value);
-    gpio.write(port, value);
-  }
-}
-
 function writeValueCB(port, value) {
-  var fn = writeValue(port, value);
-  fn(function() {});
-}
-
-function writeDelayValue(port, value, delay) {
-  console.log('writeDelay', port, value);
-  return function(cb) {
-    setTimeout(function() {
-      gpio.write(port, value, function() { cb(null); });
-    }, delay);
-  }
+	port.writeSync(value);
 }
 
