@@ -32,8 +32,6 @@ function lcdInit() {
   lcdByte(0x0C, LCD_CMD);
   lcdByte(0x28, LCD_CMD);
   lcdClear();
-
-  sleep.usleep(1000);
 }
 
 function lcdClear() {
@@ -41,48 +39,46 @@ function lcdClear() {
 }
 
 function lcdDestroy() {
+  LCD_RS.unexport();
+  LCD_E.unexport();
+  LCD_D4.unexport();
+  LCD_D5.unexport();
+  LCD_D6.unexport();
+  LCD_D7.unexport();
 }
 
 function lcdByte(byte, mode) {
-  console.log('lcdByte1', byte, mode);
-    writeValueCB(LCD_RS, mode);
-    writeValueCB(LCD_D4, (byte & 0x10) === 0x10 ? 1 : 0);
-    writeValueCB(LCD_D5, (byte & 0x20) === 0x20 ? 1 : 0);
-    writeValueCB(LCD_D6, (byte & 0x40) === 0x40 ? 1 : 0);
-    writeValueCB(LCD_D7, (byte & 0x80) === 0x80 ? 1 : 0);
-    //toggle enable pin
-    sleep.usleep(100);
-    writeValueCB(LCD_E, 1, 100);
-    sleep.usleep(100);
-    writeValueCB(LCD_E, 0, 100);
-    sleep.usleep(100);
-    writeValueCB(LCD_D4, (byte & 0x01) === 0x01 ? 1 : 0);
-    writeValueCB(LCD_D5, (byte & 0x02) === 0x02 ? 1 : 0);
-    writeValueCB(LCD_D6, (byte & 0x04) === 0x04 ? 1 : 0);
-    writeValueCB(LCD_D7, (byte & 0x08) === 0x08 ? 1 : 0);
-    //toggle enable pin
-    sleep.usleep(100);
-    writeValueCB(LCD_E, 1, 100);
-    sleep.usleep(100);
-    writeValueCB(LCD_E, 0, 100);
-    sleep.usleep(100);
-  console.log('lcdByte2', byte, mode);
+	LCD_RS.writeAsync(mode);
+
+	LCD_D4.writeAsync((byte & 0x10) === 0x10 ? 1 : 0);
+	LCD_D5.writeAsync((byte & 0x20) === 0x20 ? 1 : 0);
+	LCD_D6.writeAsync((byte & 0x40) === 0x40 ? 1 : 0);
+	LCD_D7.writeAsync((byte & 0x80) === 0x80 ? 1 : 0);
+
+	//toggle enable pin
+	sleep.usleep(100);
+	LCD_E.writeAsync(10);
+	sleep.usleep(100);
+	LCD_E.writeAsync(0);
+	sleep.usleep(100);
+
+	LCD_D4.writeAsync((byte & 0x01) === 0x01 ? 1 : 0);
+	LCD_D5.writeAsync((byte & 0x02) === 0x02 ? 1 : 0);
+	LCD_D6.writeAsync((byte & 0x04) === 0x04 ? 1 : 0);
+	LCD_D7.writeAsync((byte & 0x08) === 0x08 ? 1 : 0);
+
+	//toggle enable pin
+	sleep.usleep(100);
+	LCD_E.writeAsync(, 1, 100);
+	sleep.usleep(100);
+	LCD_E.writeAsync(, 0, 100);
+	sleep.usleep(100);
 }
 
 function lcdString(str, line) {
-  console.log('lcdString', str, line);
-
   lcdByte(line, LCD_CMD);
 
-  for (var i = 0, len = str.length; i < len; i++) {
+  for (var i = 0, len = str.length; i < len; i++)
     lcdByte(str.charCodeAt(i), LCD_CHR);
-  }
-}
-
-/////////////////////////////////
-
-function writeValueCB(port, value) {
-  console.log('write', port.gpio, value);
-  port.writeSync(value);
 }
 
